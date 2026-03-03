@@ -259,31 +259,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            // --- SNS・バックアップ機能：モバイル対応を極限まで強化 ---
-            const shareMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修のアセスメント結果を公開中。\n#解析室ナオ\n${PUBLIC_URL}`;
+            // --- SNS機能：モバイル互換性を究極まで高めた「分離パラメータ」方式 ---
+            // 本文からURLを切り離し、専用の箱(url=)に入れることで、アプリ側の解析エラーを完全に防ぎます
+            const shareText = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n#解析室ナオ アセスメント結果を公開中。`;
 
-            // 1. X（Twitter）共有ボタン
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
-                shareBtn.onclick = (e) => {
-                    e.preventDefault();
-                    const xIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMsg)}`;
-
-                    // モバイルアプリ連携は同一タブ（location.href）の方がパラメータ喪失が少ない
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    if (isMobile) {
-                        window.location.href = xIntentUrl;
-                    } else {
-                        window.open(xIntentUrl, '_blank');
-                    }
-                };
+                // PC/モバイル問わず最も安定する twitter.com/share を使用
+                // text, url を分けるのがモバイルアプリ攻略の鉄則です
+                const finalShareUrl = `https://twitter.com/share?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(PUBLIC_URL)}`;
+                shareBtn.href = finalShareUrl;
             }
 
             // 2. クリップボードコピーボタン（バックアップ）
             const copyBtn = document.getElementById('copy-btn');
             if (copyBtn) {
                 copyBtn.onclick = () => {
-                    navigator.clipboard.writeText(shareMsg).then(() => {
+                    // 共有文面と同じ内容をコピー
+                    const fullCopyText = `${shareText}\n${PUBLIC_URL}`;
+                    navigator.clipboard.writeText(fullCopyText).then(() => {
                         const originalText = copyBtn.innerText;
                         copyBtn.innerText = "コピー完了！";
                         copyBtn.classList.add('copied');
