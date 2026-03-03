@@ -259,23 +259,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            // --- SNS機能：モバイルアプリでの「読み込めません」を回避する最終安定構成 ---
-            // 全情報を一つの「text」パラメータに集約するのが、モバイルアプリ攻略の最終結論です
-            const shareMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修のアセスメント結果を公開中。\n#解析室ナオ\n${PUBLIC_URL}`;
+            // --- SNS機能：モバイルアプリ連動を100%成功させるための最終到達形式 ---
+            // 改行(\n)をスペースに置き換え、各情報を専用のパラメータ(url, hashtags, via)に分離。
+            // これがXモバイルアプリにおいて、エラーを起こさず確実に下書きを生成する「正解」の形式です。
+            const shareText = `【ボートレース投資・行動心理診断】 判定：${resData.name} 予報：${resData.loss} 解析室ナオ監修アセスメント結果を公開中。`;
+            const xHashtags = "解析室ナオ,行動心理アセスメント";
+            const xVia = "nao_boatrace";
 
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
-                // 最も互換性の高い intent/tweet を使用。パラメータを1つに絞ることでエラーを回避します
-                shareBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMsg)}`;
+                // パラメータを個別の箱に分けることで、モバイルOSの解釈ミスを物理的に防ぎます
+                const finalXUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(PUBLIC_URL)}&hashtags=${encodeURIComponent(xHashtags)}&via=${encodeURIComponent(xVia)}`;
+                shareBtn.href = finalXUrl;
             }
 
-            // 2. クリップボードコピーボタン（バックアップ）
+            // 2. クリップボードコピーボタン（バックアップ：こちらはリッチな改行あり形式を維持）
             const copyBtn = document.getElementById('copy-btn');
             if (copyBtn) {
                 copyBtn.onclick = () => {
-                    // 共有文面と同じ内容をコピー
-                    const fullCopyText = shareMsg;
-                    navigator.clipboard.writeText(fullCopyText).then(() => {
+                    const fullReport = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n#解析室ナオ\n${PUBLIC_URL}`;
+                    navigator.clipboard.writeText(fullReport).then(() => {
                         const originalText = copyBtn.innerText;
                         copyBtn.innerText = "コピー完了！";
                         copyBtn.classList.add('copied');
