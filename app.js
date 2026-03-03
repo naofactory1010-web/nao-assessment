@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 本番環境用URL設定 ---
         // 公開後のドメイン（noteのURLや独自ドメイン等）をここに設定してください
-        const PUBLIC_URL = "https://office-nao.com/app/"; // [要変更] 公開先のURL
+        const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
         const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
 
         const tweetText = encodeURIComponent(`【行動心理アセスメント：診断鑑定結果】\n\n判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の深層心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n`);
