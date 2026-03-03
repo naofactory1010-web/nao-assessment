@@ -259,30 +259,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            // --- SNS共有機能：モバイルアプリ連動の最終解決策 (v2.3) ---
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            // --- SNS共有機能：モバイルアプリ連動の根本的解決策 (v2.4) ---
             const shareBtn = document.getElementById('share-btn');
+            const shareTitle = "【ボートレース投資・行動心理診断】";
+            const shareText = `判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修アセスメント結果を公開中。\n#解析室ナオ`;
 
             if (shareBtn) {
-                if (isMobile) {
-                    // モバイル：一番の失敗原因である「target="_blank"」を削除し、同一ページ遷移でアプリを確実に起動
-                    shareBtn.removeAttribute('target');
-                    shareBtn.removeAttribute('rel');
-                    // 改行コード(\n)による読込NGを避けるため、1行（スペース区切り）に構成
-                    const flatMsg = `【ボートレース投資・行動心理診断】 判定：${resData.name} 予報：${resData.loss} #解析室ナオ ${PUBLIC_URL}`;
-                    shareBtn.href = `https://x.com/intent/tweet?text=${encodeURIComponent(flatMsg)}`;
-                } else {
-                    // PC：リッチな改行あり・別タブ形式を維持
-                    const richMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n#解析室ナオ \n${PUBLIC_URL}`;
-                    shareBtn.href = `https://x.com/intent/tweet?text=${encodeURIComponent(richMsg)}`;
-                }
+                shareBtn.onclick = async (e) => {
+                    e.preventDefault();
+
+                    // モバイルかつWeb Share APIが利用可能な場合（最も確実な共有方法）
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: shareTitle,
+                                text: shareText,
+                                url: PUBLIC_URL
+                            });
+                        } catch (err) {
+                            console.error("Share failed:", err);
+                            // ユーザーキャンセル以外の場合はフォールバックへ
+                            if (err.name !== 'AbortError') {
+                                const fullMsg = shareTitle + "\n" + shareText + "\n" + PUBLIC_URL;
+                                window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(fullMsg)}`, '_blank');
+                            }
+                        }
+                    } else {
+                        // PCまたは非対応ブラウザ：従来の直接リンク方式
+                        const fullMsg = shareTitle + "\n" + shareText + "\n" + PUBLIC_URL;
+                        window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(fullMsg)}`, '_blank');
+                    }
+                };
             }
 
-            // 2. クリップボードコピーボタン（バックアップ：こちらはリッチな改行あり形式を維持）
+            // 2. クリップボードコピーボタン（バックアップ：全環境で利用可能）
             const copyBtn = document.getElementById('copy-btn');
             if (copyBtn) {
                 copyBtn.onclick = () => {
-                    const fullReport = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n#解析室ナオ\n${PUBLIC_URL}`;
+                    const fullReport = `${shareTitle}\n${shareText}\n\n${PUBLIC_URL}`;
                     navigator.clipboard.writeText(fullReport).then(() => {
                         const originalText = copyBtn.innerText;
                         copyBtn.innerText = "コピー完了！";
