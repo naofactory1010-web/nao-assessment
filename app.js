@@ -261,13 +261,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
             const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
 
-            // シェア機能：モバイル・アプリ対応を究極に高めたリンク生成（aタグのhrefを更新）
-            const shareMsg = `【ボートレース投資・行動心理診断】\n\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメント結果を公開中。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`;
+            // シェア機能：モバイルアプリでの「下書き空っぽ」を回避するマルチパラメータ構成
+            const mainText = `【ボートレース投資・行動心理診断】\n\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修。私の心理プロファイルが可視化されました。`;
+            const shareHashtags = "解析室ナオ,行動心理アセスメント";
 
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
-                // aタグのhrefに直接流し込む（これがモバイルで最も確実な方法です）
-                shareBtn.href = `https://x.com/intent/tweet?text=${encodeURIComponent(shareMsg)}`;
+                // パラメータを箱分けすることで、モバイルアプリへの受け渡しを確実にします
+                const xIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(mainText)}&url=${encodeURIComponent(PUBLIC_URL)}&hashtags=${encodeURIComponent(shareHashtags)}&via=${encodeURIComponent(X_ACCOUNT_ID)}`;
+                shareBtn.href = xIntentUrl;
             }
         }
     }
