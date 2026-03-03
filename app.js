@@ -202,59 +202,74 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const resData = typeResults[typeKey];
+        const initialGambleRate = (score * 10); // 初期計算用
+        renderResult(typeKey, score);
 
-        document.getElementById('result-type-name').innerText = resData.name;
-        document.getElementById('result-gamble-rate').innerText = `${gambleRate.toFixed(1)}%`;
-        document.getElementById('rate-bar-fill').style.width = `${gambleRate}%`;
-        document.getElementById('result-loss-amount').innerText = resData.loss;
+        function renderResult(type, score) {
+            const resData = typeResults[type];
+            const gambleRateVal = score * 10;
 
-        // --- シームレス統合ロジック ---
-        const reportEl = document.getElementById('result-description');
-        reportEl.innerHTML = '';
+            // --- 修正：属性名とType名を構造的に分離して表示 ---
+            const firstSpaceIndex = resData.name.indexOf(' ');
+            const mainName = resData.name.substring(0, firstSpaceIndex);
+            const subName = resData.name.substring(firstSpaceIndex + 1);
 
-        // 1. 回答からインサイトを収集
-        let matchedInsights = [];
-        userAnswers.forEach(ans => {
-            if (insightTriggers[ans]) {
-                matchedInsights.push(insightTriggers[ans]);
-            }
-        });
-        // 全員に付与するコールドリーディング
-        matchedInsights.push(insightTriggers["cold-1"]);
-        matchedInsights.push(insightTriggers["cold-2"]);
+            const typeNameEl = document.getElementById('result-type-name');
+            typeNameEl.innerHTML = `
+                <span class="main-type-name">${mainName}</span>
+                <span class="sub-type-badge">${subName}</span>
+            `;
 
-        // 2. レポートをセクションごとに分割して描画
-        const sectionTexts = resData.desc.split("<br><br>");
-        const sectionMap = ["assets", "deviation", "profile", "approach"];
+            document.getElementById('result-gamble-rate').innerText = `${gambleRateVal.toFixed(1)}%`;
+            document.getElementById('rate-bar-fill').style.width = `${gambleRateVal}%`;
+            document.getElementById('result-loss-amount').innerText = resData.loss;
 
-        sectionTexts.forEach((text, index) => {
-            let sectionHtml = text;
-            const currentCat = sectionMap[index];
+            // --- シームレス統合ロジック ---
+            const reportEl = document.getElementById('result-description');
+            reportEl.innerHTML = '';
 
-            // 該当するカテゴリーのインサイトを文章として末尾に連結
-            matchedInsights.filter(ins => ins.category === currentCat).forEach(ins => {
-                sectionHtml += ins.text;
+            // 1. 回答からインサイトを収集
+            let matchedInsights = [];
+            userAnswers.forEach(ans => {
+                if (insightTriggers[ans]) {
+                    matchedInsights.push(insightTriggers[ans]);
+                }
+            });
+            // 全員に付与するコールドリーディング
+            matchedInsights.push(insightTriggers["cold-1"]);
+            matchedInsights.push(insightTriggers["cold-2"]);
+
+            // 2. レポートをセクションごとに分割して描画
+            const sectionTexts = resData.desc.split("<br><br>");
+            const sectionMap = ["assets", "deviation", "profile", "approach"];
+
+            sectionTexts.forEach((text, index) => {
+                let sectionHtml = text;
+                const currentCat = sectionMap[index];
+
+                // 該当するカテゴリーのインサイトを文章として末尾に連結
+                matchedInsights.filter(ins => ins.category === currentCat).forEach(ins => {
+                    sectionHtml += ins.text;
+                });
+
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'report-section';
+                sectionDiv.innerHTML = sectionHtml;
+                reportEl.appendChild(sectionDiv);
             });
 
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'report-section';
-            sectionDiv.innerHTML = sectionHtml;
-            reportEl.appendChild(sectionDiv);
-        });
+            // --- 本番環境用URL設定 ---
+            const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
+            const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
 
-        // --- 本番環境用URL設定 ---
-        const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-        const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
+            // シェア機能：診断結果をX（Twitter）に投稿するためのリンク生成
+            const tweetText = encodeURIComponent(`【ボートレース投資・行動心理診断】\n\n判定判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`);
 
-        // シェア機能：診断結果をX（Twitter）に投稿するためのリンク生成
-        const tweetText = encodeURIComponent(`【ボートレース投資・行動心理診断】\n\n判定判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`);
-
-        const shareBtn = document.getElementById('share-btn');
-        if (shareBtn) {
-            shareBtn.onclick = () => {
-                window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
-            };
+            const shareBtn = document.getElementById('share-btn');
+            if (shareBtn) {
+                shareBtn.onclick = () => {
+                    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
+                };
+            }
         }
-    }
-});
+    });
