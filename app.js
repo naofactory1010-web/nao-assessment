@@ -259,18 +259,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            // --- SNS機能：モバイルアプリ連動を100%成功させるための最終到達形式 ---
-            // 改行(\n)をスペースに置き換え、各情報を専用のパラメータ(url, hashtags, via)に分離。
-            // これがXモバイルアプリにおいて、エラーを起こさず確実に下書きを生成する「正解」の形式です。
-            const shareText = `【ボートレース投資・行動心理診断】 判定：${resData.name} 予報：${resData.loss} 解析室ナオ監修アセスメント結果を公開中。`;
-            const xHashtags = "解析室ナオ,行動心理アセスメント";
-            const xVia = "nao_boatrace";
-
+            // --- SNS共有機能：モバイルアプリ連動の最終解決策 (v2.3) ---
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             const shareBtn = document.getElementById('share-btn');
+
             if (shareBtn) {
-                // パラメータを個別の箱に分けることで、モバイルOSの解釈ミスを物理的に防ぎます
-                const finalXUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(PUBLIC_URL)}&hashtags=${encodeURIComponent(xHashtags)}&via=${encodeURIComponent(xVia)}`;
-                shareBtn.href = finalXUrl;
+                if (isMobile) {
+                    // モバイル：一番の失敗原因である「target="_blank"」を削除し、同一ページ遷移でアプリを確実に起動
+                    shareBtn.removeAttribute('target');
+                    shareBtn.removeAttribute('rel');
+                    // 改行コード(\n)による読込NGを避けるため、1行（スペース区切り）に構成
+                    const flatMsg = `【ボートレース投資・行動心理診断】 判定：${resData.name} 予報：${resData.loss} #解析室ナオ ${PUBLIC_URL}`;
+                    shareBtn.href = `https://x.com/intent/tweet?text=${encodeURIComponent(flatMsg)}`;
+                } else {
+                    // PC：リッチな改行あり・別タブ形式を維持
+                    const richMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n#解析室ナオ \n${PUBLIC_URL}`;
+                    shareBtn.href = `https://x.com/intent/tweet?text=${encodeURIComponent(richMsg)}`;
+                }
             }
 
             // 2. クリップボードコピーボタン（バックアップ：こちらはリッチな改行あり形式を維持）
