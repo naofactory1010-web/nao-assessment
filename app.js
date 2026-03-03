@@ -259,17 +259,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
+            // --- SNS・バックアップ機能：モバイル対応を極限まで強化 ---
+            const shareMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修のアセスメント結果を公開中。\n#解析室ナオ\n${PUBLIC_URL}`;
 
-            // シェア機能：モバイルアプリでの「下書き空っぽ」を回避するマルチパラメータ構成
-            const mainText = `【ボートレース投資・行動心理診断】\n\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修。私の心理プロファイルが可視化されました。`;
-            const shareHashtags = "解析室ナオ,行動心理アセスメント";
-
+            // 1. X（Twitter）共有ボタン
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
-                // パラメータを箱分けすることで、モバイルアプリへの受け渡しを確実にします
-                const xIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(mainText)}&url=${encodeURIComponent(PUBLIC_URL)}&hashtags=${encodeURIComponent(shareHashtags)}&via=${encodeURIComponent(X_ACCOUNT_ID)}`;
-                shareBtn.href = xIntentUrl;
+                shareBtn.onclick = (e) => {
+                    e.preventDefault();
+                    const xIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMsg)}`;
+
+                    // モバイルアプリ連携は同一タブ（location.href）の方がパラメータ喪失が少ない
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    if (isMobile) {
+                        window.location.href = xIntentUrl;
+                    } else {
+                        window.open(xIntentUrl, '_blank');
+                    }
+                };
+            }
+
+            // 2. クリップボードコピーボタン（バックアップ）
+            const copyBtn = document.getElementById('copy-btn');
+            if (copyBtn) {
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(shareMsg).then(() => {
+                        const originalText = copyBtn.innerText;
+                        copyBtn.innerText = "コピー完了！";
+                        copyBtn.classList.add('copied');
+                        setTimeout(() => {
+                            copyBtn.innerText = originalText;
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Copy failed', err);
+                        alert("コピーに失敗しました。お手数ですが手動で選択してコピーしてください。");
+                    });
+                };
             }
         }
     }
