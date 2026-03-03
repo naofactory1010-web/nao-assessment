@@ -247,13 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
         const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
 
-        // モバイル対応：URLをtextパラメータに含め、x.comドメインを使用
-        const rawText = `【行動心理アセスメント：診断鑑定結果】\n\n判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の深層心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`;
-        const tweetText = encodeURIComponent(rawText);
+        // シェア機能：診断結果をX（Twitter）に投稿するためのリンク生成
+        const tweetText = encodeURIComponent(`【ボートレース投資・行動心理診断】\n\n判定判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`);
 
         const shareBtn = document.getElementById('share-btn');
-        shareBtn.onclick = () => {
-            window.open(`https://x.com/intent/tweet?text=${tweetText}`, '_blank');
-        };
+        if (shareBtn) {
+            shareBtn.onclick = () => {
+                window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
+            };
+        }
     }
 });
