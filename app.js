@@ -259,16 +259,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- 本番環境用URL設定 ---
             const PUBLIC_URL = "https://naofactory1010-web.github.io/nao-assessment/"; // 公開URLを設定済み
-            // --- SNS機能：モバイル互換性を究極まで高めた「分離パラメータ」方式 ---
-            // 本文からURLを切り離し、専用の箱(url=)に入れることで、アプリ側の解析エラーを完全に防ぎます
-            const shareText = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n#解析室ナオ アセスメント結果を公開中。`;
+            // --- SNS機能：モバイルアプリでの「読み込めません」を回避する最終安定構成 ---
+            // 全情報を一つの「text」パラメータに集約するのが、モバイルアプリ攻略の最終結論です
+            const shareMsg = `【ボートレース投資・行動心理診断】\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報：${resData.loss}\n\n解析室ナオ監修のアセスメント結果を公開中。\n#解析室ナオ\n${PUBLIC_URL}`;
 
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
-                // PC/モバイル問わず最も安定する twitter.com/share を使用
-                // text, url を分けるのがモバイルアプリ攻略の鉄則です
-                const finalShareUrl = `https://twitter.com/share?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(PUBLIC_URL)}`;
-                shareBtn.href = finalShareUrl;
+                // 最も互換性の高い intent/tweet を使用。パラメータを1つに絞ることでエラーを回避します
+                shareBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMsg)}`;
             }
 
             // 2. クリップボードコピーボタン（バックアップ）
@@ -276,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (copyBtn) {
                 copyBtn.onclick = () => {
                     // 共有文面と同じ内容をコピー
-                    const fullCopyText = `${shareText}\n${PUBLIC_URL}`;
+                    const fullCopyText = shareMsg;
                     navigator.clipboard.writeText(fullCopyText).then(() => {
                         const originalText = copyBtn.innerText;
                         copyBtn.innerText = "コピー完了！";
