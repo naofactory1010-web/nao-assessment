@@ -202,12 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const initialGambleRate = (score * 10); // 初期計算用
-        renderResult(typeKey, score);
+        renderResult(typeKey, gambleRate);
 
-        function renderResult(type, score) {
+        function renderResult(type, currentGambleRate) {
             const resData = typeResults[type];
-            const gambleRateVal = score * 10;
+            const gambleRateVal = currentGambleRate;
 
             // --- 修正：属性名とType名を構造的に分離して表示 ---
             const firstSpaceIndex = resData.name.indexOf(' ');
@@ -263,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const X_ACCOUNT_ID = "nao_boatrace"; // [@nao_boatrace] アカウントIDを設定完了
 
             // シェア機能：診断結果をX（Twitter）に投稿するためのリンク生成
-            const tweetText = encodeURIComponent(`【ボートレース投資・行動心理診断】\n\n判定判定：${resData.name}\n投資乖離指数：${gambleRate.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`);
+            const tweetText = encodeURIComponent(`【ボートレース投資・行動心理診断】\n\n判定：${resData.name}\n投資乖離指数：${gambleRateVal.toFixed(1)}%\n予報ポテンシャル：${resData.loss}\n\n解析室ナオ（ @${X_ACCOUNT_ID} ）監修のアセスメントにより、私の心理プロファイルが可視化されました。\n\n#解析室ナオ #行動心理アセスメント\n${PUBLIC_URL}`);
 
             const shareBtn = document.getElementById('share-btn');
             if (shareBtn) {
@@ -272,4 +271,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         }
-    });
+    }
+});
