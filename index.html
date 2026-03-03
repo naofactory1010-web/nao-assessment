@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解析室ナオ | 行動心理アセスメント</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+JP:wght@300;400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="app-container">
+
+        <!-- スタート画面 -->
+        <div id="start-screen" class="screen active">
+            <div class="header-image-container">
+                <img src="assets/header.png" alt="Office Nao" class="header-image">
+            </div>
+            <h1 class="premium-title">行動心理アセスメント</h1>
+            <p class="subtitle">Investment Psychology Analysis [System: NAO]</p>
+
+            <div class="intro-box">
+                <p class="intro-text">
+                    本アセスメントは、ボートレース投資におけるあなたの意思決定プロセスを
+                    行動心理学および行動経済学の観点から定量的に解析します。
+                </p>
+                <p class="intro-detail">
+                    自己の認知プロファイルと経済的損失ポテンシャルを正しく把握することは、
+                    長期的な資産防衛における必須のステップです。
+                </p>
+            </div>
+
+            <div class="info-badges">
+                <span>臨床データ 270,000+</span>
+                <span>全32問 (要5分)</span>
+                <span>プライバシー完全保護</span>
+            </div>
+
+            <button id="start-btn" class="action-btn">解析プロセスを開始する</button>
+        </div>
+
+        <!-- 質問画面 -->
+        <div id="question-screen" class="screen">
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <p id="progress-text" class="progress-text">解析進捗: 0%</p>
+
+            <h2 id="question-title" class="q-title">Q1. 連続不的中時の行動選択</h2>
+            <div class="situation-box">
+                <p id="question-situation">シチュエーションを読み、最も自身の実際の行動に近いものを選択してください。</p>
+            </div>
+
+            <div id="options-container" class="options-container">
+                <!-- オプションはJSで動的に生成 -->
+            </div>
+        </div>
+
+        <!-- ローディング（解析中）画面 -->
+        <div id="loading-screen" class="screen">
+            <div class="loader-container">
+                <div class="loader-pulse"></div>
+                <div class="loader-text-spin">ANALYZING...</div>
+            </div>
+            <h2>認知バイアスの定量的抽出中...</h2>
+            <p id="loading-text">意思決定アルゴリズムをシミュレートしています</p>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="result-screen" class="screen">
+            <h2 class="result-header">診断報告書</h2>
+
+            <div class="type-result-box">
+                <p class="type-label">検出された認知プロファイル</p>
+                <h1 id="result-type-name" class="type-name">【タイプ名】</h1>
+            </div>
+
+            <div class="gamble-rate-container">
+                <p id="result-label-text" class="rate-label">投資乖離指数（ギャンブル化率）</p>
+                <h1 id="result-gamble-rate" class="gamble-rate">0.0%</h1>
+                <div class="rate-bar-bg">
+                    <div id="rate-bar-fill" class="rate-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="loss-prediction">
+                <p>将来推計：期待収支ポテンシャル</p>
+                <h2 id="result-loss-amount" class="loss-amount">分析中</h2>
+            </div>
+
+            <div class="clinical-report">
+                <h3>▼ 鑑定臨床レポート</h3>
+                <div id="result-description" class="report-content">診断の詳細な説明。</div>
+            </div>
+
+            <div class="cta-container">
+                <p class="cta-text">検出された認知バイアスを修正し、期待値思考を恒常化させるための具体的な行動指針を提示します。</p>
+                <a href="#" id="cta-link" class="action-btn cta-btn">期待値防衛理論：公式ガイドラインを確認する</a>
+            </div>
+
+            <div class="share-container">
+                <button id="share-btn" class="secondary-btn">アセスメント結果をXで報告する</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- データの読み込み -->
+    <script src="data.js"></script>
+    <script src="insights.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
